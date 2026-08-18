@@ -40,10 +40,10 @@
         }
         .anim-pop { animation: node-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col items-center justify-between p-3 sm:p-5 select-none relative overflow-x-hidden">
 
-    <!-- HUD SUPERIOR -->
     <header class="w-full max-w-md bg-slate-900/90 border border-amber-500/30 rounded-2xl p-3.5 shadow-2xl backdrop-blur-md flex justify-between items-center mb-3 sticky top-2 z-50 gold-glow">
         <div class="flex items-center space-x-3">
             <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 p-[1px] shadow-lg anim-float">
@@ -70,10 +70,8 @@
         </div>
     </header>
 
-    <!-- CONTENEDOR PRINCIPAL -->
     <main class="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-md flex-1 flex flex-col justify-between relative overflow-hidden">
 
-        <!-- NAV DENTRO DE JUEGO -->
         <nav id="nav-bar" class="hidden-screen flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
             <button onclick="playSound('click'); confirmGoMap();" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-amber-200 text-xs font-bold border border-amber-500/20 transition active:scale-95 flex items-center gap-1">
                 <span>🗺️ Mapa</span>
@@ -88,7 +86,6 @@
             </div>
         </nav>
 
-        <!-- REGISTRO / SELECCIÓN DE JUGADOR -->
         <section id="screen-register" class="space-y-5 my-auto text-center anim-pop">
             <div class="space-y-2">
                 <div class="w-16 h-16 bg-amber-500/10 border-2 border-amber-500/40 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-2xl gold-glow anim-float">
@@ -98,13 +95,11 @@
                 <p class="text-xs text-slate-400 leading-relaxed px-4">Ingresa tu personaje o selecciona uno creado en este dispositivo.</p>
             </div>
 
-            <!-- PERFILES EXISTENTES EN ESTE DISPOSITIVO -->
             <div id="existing-profiles-container" class="hidden-screen space-y-2 text-left bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
                 <span class="text-[10px] font-black text-amber-400/90 uppercase tracking-wider block">Personajes en este dispositivo:</span>
                 <div id="profiles-list" class="space-y-1.5 max-h-32 overflow-y-auto pr-1"></div>
             </div>
 
-            <!-- FORMULARIO NUEVO PERFIL -->
             <form id="form-register" class="space-y-3 text-left">
                 <div>
                     <label class="block text-[11px] font-extrabold text-amber-400/90 uppercase tracking-wider mb-1 pl-1">Nuevo Explorador</label>
@@ -119,7 +114,6 @@
             <p id="register-limit-msg" class="text-[10px] text-slate-500 font-semibold"></p>
         </section>
 
-        <!-- MAPA DE MUNDOS -->
         <section id="screen-map" class="hidden-screen space-y-4 my-auto">
             <div class="flex justify-between items-center mb-1">
                 <div>
@@ -134,7 +128,6 @@
             <div id="world-nodes-list" class="w-full space-y-3 max-h-[380px] overflow-y-auto pr-1"></div>
         </section>
 
-        <!-- PREGUNTAS (FILTRO DE ENTRADA) -->
         <section id="screen-quiz" class="hidden-screen space-y-4 my-auto anim-pop">
             <div class="flex justify-between items-center text-xs text-slate-400 font-bold border-b border-slate-800 pb-2">
                 <span id="quiz-world-title" class="text-amber-300 font-serif-epic">Filtro de Entrada</span>
@@ -157,7 +150,6 @@
             <p id="quiz-feedback" class="text-xs text-center font-bold min-h-[1.25rem]"></p>
         </section>
 
-        <!-- INVESTIGACIÓN / EXPEDIENTE -->
         <section id="screen-investigation" class="hidden-screen space-y-4 my-auto anim-pop">
             <div class="border-b border-slate-800 pb-2">
                 <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">Fase Final: Expediente</span>
@@ -172,7 +164,6 @@
             <p id="investigation-feedback" class="text-xs text-center font-bold min-h-[1.25rem]"></p>
         </section>
 
-        <!-- PANTALLA COMPLETADO -->
         <section id="screen-complete" class="hidden-screen space-y-4 text-center my-auto anim-pop">
             <div class="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-400/50 rounded-3xl flex items-center justify-center mx-auto text-4xl emerald-glow anim-float">
                 🏆
@@ -206,10 +197,9 @@
             </div>
         </section>
 
-        <!-- TABLA DE POSICIONES (RANKING GLOBAL/LOCAL) -->
         <section id="screen-leaderboard" class="hidden-screen space-y-4 my-auto anim-pop">
             <div class="text-center border-b border-slate-800 pb-2">
-                <h2 class="font-serif-epic text-lg font-black text-amber-300 gold-text-glow">Tabla de Posiciones</h2>
+                <h2 class="font-serif-epic text-lg font-black text-amber-300 gold-text-glow">Tabla de Posiciones Global</h2>
                 <p class="text-[10px] text-slate-400">Criterio: 1.º Mayor Puntaje | 2.º Menor Cantidad de Intentos</p>
             </div>
 
@@ -234,7 +224,6 @@
         Traducción del Nuevo Mundo (TNM) • Edición Interactiva
     </footer>
 
-    <!-- CARGA DE ARCHIVOS JS DE MUNDOS -->
     <script src="genesis.js"></script>
     <script src="exodo.js"></script>
     <script src="levitico.js"></script>
@@ -242,6 +231,17 @@
     <script src="deuteronomio.js"></script>
 
     <script>
+        // URL de tu proyecto en Supabase
+        const SUPABASE_URL = 'https://pbovsaikcqhtppnpwvso.supabase.co';
+
+        // Clave ANON PUBLIC que acabas de copiar
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBib3ZzYWlrY3FodHBwbnB3dnNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwMTM2MjksImV4cCI6MjEwMjU4OTYyOX0.jlbjopO-_aFE53Gb0HOtTer-1_K4SKl-sQx5zLlrtmI';
+
+        // Inicializar el cliente de Supabase
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // ==========================================
+        // 2. LÓGICA DEL JUEGO
+        // ==========================================
         const MAX_PERFILES_PER_DISPOSITIVO = 5;
 
         let state = {
@@ -450,7 +450,6 @@
 
             localStorage.setItem("JWgame_profiles", JSON.stringify(profiles));
             localStorage.setItem("JWgame_last_active_user", state.username);
-            updateMockLeaderboard();
         }
 
         function switchPlayer() {
@@ -669,7 +668,11 @@
                     state.scoresByWorld[worldKey] = state.score;
                 }
 
+                // Guardar en almacenamiento local
                 saveActiveProfile();
+                
+                // --- GUARDAR EN SUPABASE ---
+                saveScoreToSupabase();
 
                 const attempts = state.attempts[worldKey];
 
@@ -686,45 +689,56 @@
             }
         }
 
-        /* --- TABLA DE POSICIONES GENERAL --- */
-        function updateMockLeaderboard() {
-            const profiles = getAllProfiles();
-            let leaderboard = [];
+        /* --- INTEGRACIÓN DE SUPABASE (Guardar y Cargar) --- */
+        async function saveScoreToSupabase() {
+            const worldKey = `world${state.activeWorld}`;
+            const attempts = state.attempts[worldKey] || 1;
 
-            Object.keys(profiles).forEach(name => {
-                const p = profiles[name];
-                const totalScore = Object.values(p.scoresByWorld || {}).reduce((a, b) => a + b, 0);
-                const totalAttempts = Object.values(p.attempts || {}).reduce((a, b) => a + b, 0);
+            const { data, error } = await supabaseClient
+                .from('scores')
+                .insert([
+                    {
+                        username: state.username,
+                        score: state.score,
+                        book: currentBookData.title,
+                        attempts: attempts
+                    }
+                ]);
 
-                if (totalScore > 0) {
-                    leaderboard.push({
-                        nombre: name,
-                        puntos: totalScore,
-                        intentos: totalAttempts
-                    });
-                }
-            });
-
-            leaderboard.sort((a, b) => {
-                if (b.puntos !== a.puntos) return b.puntos - a.puntos;
-                return a.intentos - b.intentos;
-            });
-
-            localStorage.setItem("tnm_global_leaderboard", JSON.stringify(leaderboard));
+            if (error) {
+                console.error('Error al guardar puntaje en Supabase:', error);
+            } else {
+                console.log('Puntaje guardado con éxito:', data);
+            }
         }
 
-        function showLeaderboard() {
-            updateMockLeaderboard();
-            const leaderboard = JSON.parse(localStorage.getItem("tnm_global_leaderboard")) || [];
+        async function showLeaderboard() {
+            showScreen("screen-leaderboard");
             const container = document.getElementById("leaderboard-rows");
+            container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Cargando puntuaciones globales...</div>`;
+
+            // Obtener el Top 10 desde Supabase
+            const { data, error } = await supabaseClient
+                .from('scores')
+                .select('*')
+                .order('score', { ascending: false })
+                .order('attempts', { ascending: true })
+                .limit(10);
+
+            if (error || !data) {
+                console.error("Error cargando leaderboard:", error);
+                container.innerHTML = `<div class="p-4 text-center text-xs text-red-400">Error al cargar ranking.</div>`;
+                return;
+            }
+
             container.innerHTML = "";
 
-            if (leaderboard.length === 0) {
+            if (data.length === 0) {
                 container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Aún no hay puntuaciones registradas.</div>`;
             } else {
-                leaderboard.forEach((player, idx) => {
+                data.forEach((player, idx) => {
                     const row = document.createElement("div");
-                    const isCurrentPlayer = player.nombre === state.username;
+                    const isCurrentPlayer = player.username === state.username;
                     
                     row.className = `grid grid-cols-12 p-2.5 text-xs font-semibold items-center ${
                         isCurrentPlayer ? 'bg-amber-500/20 text-amber-200 border-l-2 border-amber-400' : 'text-slate-300'
@@ -732,22 +746,24 @@
 
                     row.innerHTML = `
                         <span class="col-span-2 text-center font-bold ${idx < 3 ? 'text-amber-400 font-serif-epic' : 'text-slate-500'}">#${idx + 1}</span>
-                        <span class="col-span-5 font-bold truncate">${player.nombre} ${isCurrentPlayer ? ' (Tú)' : ''}</span>
-                        <span class="col-span-3 text-right font-black text-emerald-400">${player.puntos} pts</span>
-                        <span class="col-span-2 text-center text-slate-400 text-[11px]">${player.intentos} int.</span>
+                        <span class="col-span-5 font-bold truncate">${player.username} ${isCurrentPlayer ? ' (Tú)' : ''}</span>
+                        <span class="col-span-3 text-right font-black text-emerald-400">${player.score} pts</span>
+                        <span class="col-span-2 text-center text-slate-400 text-[11px]">${player.attempts} int.</span>
                     `;
 
                     container.appendChild(row);
                 });
             }
-
-            showScreen("screen-leaderboard");
         }
 
+        /* --- BOTÓN DE COMPARTIR EN WHATSAPP --- */
         function shareScore() {
             const worldKey = `world${state.activeWorld}`;
             const attempts = state.attempts[worldKey] || 1;
-            const text = `🏆 ¡Completé ${currentBookData.title} en el Desafío TNM!\n\n• Jugador: ${state.username}\n• Puntaje: ${state.score} pts máximos\n• Intentos: #${attempts}\n\n¿Puedes lograrlo en menos intentos? 📖✨`;
+            const gameUrl = "https://yuser2004.github.io/JWgame/";
+            
+            const text = `🏆 ¡Completé ${currentBookData.title} en el Desafío TNM!\n\n• Jugador: ${state.username}\n• Puntaje: ${state.score} pts máximos\n• Intentos: #${attempts}\n\nJuega aquí: ${gameUrl}\n\n¿Puedes lograrlo en menos intentos? 📖✨`;
+            
             window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
         }
     </script>
