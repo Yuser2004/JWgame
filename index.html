@@ -73,31 +73,45 @@
             <button onclick="confirmGoMap()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-amber-200 text-xs font-bold border border-amber-500/20 transition active:scale-95 flex items-center gap-1">
                 <span>🗺️ Mapa</span>
             </button>
-            <button onclick="showLeaderboard()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 transition active:scale-95 flex items-center gap-1">
-                <span>🏆 Ranking</span>
-            </button>
+            <div class="flex gap-1.5">
+                <button onclick="switchPlayer()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition active:scale-95">
+                    👤 Cambiar
+                </button>
+                <button onclick="showLeaderboard()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 transition active:scale-95 flex items-center gap-1">
+                    <span>🏆 Ranking</span>
+                </button>
+            </div>
         </nav>
 
-        <!-- REGISTRO DE JUGADOR -->
-        <section id="screen-register" class="space-y-6 my-auto text-center anim-pop">
+        <!-- REGISTRO / SELECCIÓN DE JUGADOR -->
+        <section id="screen-register" class="space-y-5 my-auto text-center anim-pop">
             <div class="space-y-2">
-                <div class="w-20 h-20 bg-amber-500/10 border-2 border-amber-500/40 rounded-3xl flex items-center justify-center mx-auto text-4xl shadow-2xl gold-glow anim-float">
+                <div class="w-16 h-16 bg-amber-500/10 border-2 border-amber-500/40 rounded-3xl flex items-center justify-center mx-auto text-3xl shadow-2xl gold-glow anim-float">
                     ⚔️
                 </div>
-                <h2 class="font-serif-epic text-2xl font-black text-amber-300 gold-text-glow">Desafío Bíblico</h2>
-                <p class="text-xs text-slate-400 leading-relaxed px-4">Pon a prueba tu investigación bíblica y compite en el ranking global por precisión e intentos.</p>
+                <h2 class="font-serif-epic text-xl font-black text-amber-300 gold-text-glow">Desafío Bíblico</h2>
+                <p class="text-xs text-slate-400 leading-relaxed px-4">Ingresa tu personaje o selecciona uno creado en este dispositivo.</p>
             </div>
 
-            <form id="form-register" class="space-y-4 text-left">
+            <!-- PERFILES EXISTENTES EN ESTE DISPOSITIVO -->
+            <div id="existing-profiles-container" class="hidden-screen space-y-2 text-left bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
+                <span class="text-[10px] font-black text-amber-400/90 uppercase tracking-wider block">Personajes en este dispositivo:</span>
+                <div id="profiles-list" class="space-y-1.5 max-h-32 overflow-y-auto pr-1"></div>
+            </div>
+
+            <!-- FORMULARIO NUEVO PERFIL -->
+            <form id="form-register" class="space-y-3 text-left">
                 <div>
-                    <label class="block text-[11px] font-extrabold text-amber-400/90 uppercase tracking-wider mb-1 pl-1">Nombre del Explorador</label>
+                    <label class="block text-[11px] font-extrabold text-amber-400/90 uppercase tracking-wider mb-1 pl-1">Nuevo Explorador</label>
                     <input type="text" id="input-username" required placeholder="Ej. Yuser" 
-                           class="w-full px-4 py-3.5 rounded-xl bg-slate-950/90 border border-amber-500/30 text-white placeholder-slate-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition text-sm">
+                           class="w-full px-4 py-3 rounded-xl bg-slate-950/90 border border-amber-500/30 text-white placeholder-slate-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition text-sm">
                 </div>
-                <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:brightness-110 text-slate-950 font-serif-epic font-black rounded-xl transition shadow-xl gold-glow active:scale-95 text-sm uppercase tracking-wider">
-                    Iniciar Aventura
+                <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:brightness-110 text-slate-950 font-serif-epic font-black rounded-xl transition shadow-xl gold-glow active:scale-95 text-xs uppercase tracking-wider">
+                    Iniciar / Registrar
                 </button>
             </form>
+            
+            <p id="register-limit-msg" class="text-[10px] text-slate-500 font-semibold"></p>
         </section>
 
         <!-- MAPA DE MUNDOS -->
@@ -181,13 +195,13 @@
                 <button onclick="shareScore()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 active:scale-95">
                     <span>💬 Compartir Progreso en WhatsApp</span>
                 </button>
-                <button onclick="showScreen('screen-map')" class="w-full py-2.5 text-xs font-bold text-slate-400 hover:text-white transition">
+                <button onclick="renderMap(); showScreen('screen-map');" class="w-full py-2.5 text-xs font-bold text-slate-400 hover:text-white transition">
                     Volver al Mapa de Mundos
                 </button>
             </div>
         </section>
 
-        <!-- TABLA DE POSICIONES (RANKING GLOBAL) -->
+        <!-- TABLA DE POSICIONES (RANKING GLOBAL/LOCAL) -->
         <section id="screen-leaderboard" class="hidden-screen space-y-4 my-auto anim-pop">
             <div class="text-center border-b border-slate-800 pb-2">
                 <h2 class="font-serif-epic text-lg font-black text-amber-300 gold-text-glow">Tabla de Posiciones</h2>
@@ -204,7 +218,7 @@
                 <div id="leaderboard-rows" class="divide-y divide-slate-800/60 max-h-[260px] overflow-y-auto"></div>
             </div>
 
-            <button onclick="showScreen('screen-map')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl transition">
+            <button onclick="renderMap(); showScreen('screen-map');" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl transition">
                 Volver al Mapa
             </button>
         </section>
@@ -215,7 +229,7 @@
         Traducción del Nuevo Mundo (TNM) • Edición Interactiva
     </footer>
 
-    <!-- CARGA DE ARCHIVOS JS -->
+    <!-- CARGA DE ARCHIVOS JS DE MUNDOS -->
     <script src="genesis.js"></script>
     <script src="exodo.js"></script>
     <script src="levitico.js"></script>
@@ -223,6 +237,8 @@
     <script src="deuteronomio.js"></script>
 
     <script>
+        const MAX_PERFILES_PER_DISPOSITIVO = 5;
+
         let state = {
             username: '',
             score: 0,
@@ -236,46 +252,125 @@
         let currentQuizIndex = 0;
 
         document.addEventListener("DOMContentLoaded", () => {
-            loadState();
+            initDeviceId();
+            renderRegisterScreen();
+
             document.getElementById("form-register").addEventListener("submit", (e) => {
                 e.preventDefault();
                 const name = document.getElementById("input-username").value.trim();
                 if (name) {
-                    state.username = name;
-                    saveState();
-                    renderMap();
-                    showScreen("screen-map");
+                    if (loginOrRegisterUser(name)) {
+                        renderMap();
+                        showScreen("screen-map");
+                    }
                 }
             });
         });
 
-        function loadState() {
-            const saved = localStorage.getItem("tnm_game_data");
-            if (saved) {
-                state = JSON.parse(saved);
-                if (!state.attempts) state.attempts = {};
-                if (!state.completed) state.completed = {};
-                if (!state.scoresByWorld) state.scoresByWorld = {};
-                renderMap();
-                showScreen("screen-map");
+        /* --- SISTEMA DE CONTROL DE DISPOSITIVO Y PERFILES --- */
+        function initDeviceId() {
+            let deviceId = localStorage.getItem("JWgame_device_id");
+            if (!deviceId) {
+                deviceId = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+                localStorage.setItem("JWgame_device_id", deviceId);
+            }
+            return deviceId;
+        }
+
+        function getAllProfiles() {
+            const profilesData = localStorage.getItem("JWgame_profiles");
+            return profilesData ? JSON.parse(profilesData) : {};
+        }
+
+        function renderRegisterScreen() {
+            const profiles = getAllProfiles();
+            const profileNames = Object.keys(profiles);
+            const container = document.getElementById("existing-profiles-container");
+            const list = document.getElementById("profiles-list");
+            const limitMsg = document.getElementById("register-limit-msg");
+
+            list.innerHTML = "";
+            limitMsg.textContent = `Límite por dispositivo: ${profileNames.length}/${MAX_PERFILES_PER_DISPOSITIVO} personajes.`;
+
+            if (profileNames.length > 0) {
+                container.classList.remove("hidden-screen");
+                profileNames.forEach(name => {
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.className = "w-full p-2 rounded-xl bg-slate-900 hover:bg-amber-500/20 border border-slate-700 hover:border-amber-500/40 text-xs text-amber-300 font-bold flex justify-between items-center transition active:scale-98";
+                    
+                    const totalPts = Object.values(profiles[name].scoresByWorld || {}).reduce((a, b) => a + b, 0);
+                    btn.innerHTML = `<span>👤 ${name}</span> <span class="text-emerald-400 text-[10px]">${totalPts} pts</span>`;
+                    btn.onclick = () => {
+                        loginOrRegisterUser(name);
+                        renderMap();
+                        showScreen("screen-map");
+                    };
+                    list.appendChild(btn);
+                });
             } else {
-                showScreen("screen-register");
+                container.classList.add("hidden-screen");
             }
         }
 
-        function saveState() {
-            localStorage.setItem("tnm_game_data", JSON.stringify(state));
+        function loginOrRegisterUser(name) {
+            const profiles = getAllProfiles();
+            const nameKey = name.trim();
+
+            // Si el personaje ya existe en este dispositivo
+            if (profiles[nameKey]) {
+                state.username = nameKey;
+                state.attempts = profiles[nameKey].attempts || {};
+                state.completed = profiles[nameKey].completed || {};
+                state.scoresByWorld = profiles[nameKey].scoresByWorld || {};
+                saveActiveProfile();
+                return true;
+            }
+
+            // Si es un personaje nuevo, validar el límite
+            if (Object.keys(profiles).length >= MAX_PERFILES_PER_DISPOSITIVO) {
+                alert(`Límite alcanzado: Este dispositivo ya tiene ${MAX_PERFILES_PER_DISPOSITIVO} personajes. Selecciona uno de la lista existente.`);
+                return false;
+            }
+
+            // Crear el nuevo personaje
+            state.username = nameKey;
+            state.attempts = {};
+            state.completed = {};
+            state.scoresByWorld = {};
+            saveActiveProfile();
+            return true;
+        }
+
+        function saveActiveProfile() {
+            if (!state.username) return;
+            const profiles = getAllProfiles();
+            
+            profiles[state.username] = {
+                attempts: state.attempts,
+                completed: state.completed,
+                scoresByWorld: state.scoresByWorld,
+                lastActive: Date.now()
+            };
+
+            localStorage.setItem("JWgame_profiles", JSON.stringify(profiles));
+            localStorage.setItem("JWgame_last_active_user", state.username);
             updateMockLeaderboard();
         }
 
+        function switchPlayer() {
+            renderRegisterScreen();
+            showScreen("screen-register");
+        }
+
+        /* --- MOTOR DEL JUEGO Y NAVEGACIÓN --- */
         function updateHeader() {
             document.getElementById("player-display").querySelector("span:last-child").textContent = state.username || "Invitado";
             const currentWorldKey = `world${state.activeWorld || 1}`;
-            const currentAttempts = state.attempts[currentWorldKey] || 1;
-            document.getElementById("level-attempt-display").textContent = `#${currentAttempts}`;
+            const currentAttempts = state.attempts[currentWorldKey] || 0;
+            document.getElementById("level-attempt-display").textContent = `#${currentAttempts + 1}`;
         }
 
-        /* RENDERIZADO DEL MAPA CON MUNDOS PASADOS COMO COMPLETADOS */
         function renderMap() {
             updateHeader();
             const container = document.getElementById("world-nodes-list");
@@ -344,7 +439,7 @@
         }
 
         function confirmGoMap() {
-            if (confirm("¿Deseas volver al mapa? El intento actual se reiniciará.")) {
+            if (confirm("¿Deseas volver al mapa? El progreso no guardado de este intento se perderá.")) {
                 renderMap();
                 showScreen("screen-map");
             }
@@ -352,18 +447,13 @@
 
         function startWorld(worldNum) {
             state.activeWorld = worldNum;
-            const worldKey = `world${worldNum}`;
-
-            if (!state.attempts[worldKey]) state.attempts[worldKey] = 0;
-            state.attempts[worldKey]++;
-            state.score = 0; // Se acumulan puntos del intento actual
+            state.score = 0;
 
             currentBookData = window.booksData[worldNum];
 
             document.getElementById("quiz-world-title").textContent = `Filtro: ${currentBookData.title}`;
             document.getElementById("investigation-title").textContent = `Investigación de ${currentBookData.title}`;
 
-            saveState();
             updateHeader();
 
             currentQuizIndex = 0;
@@ -397,12 +487,10 @@
             if (selectedIdx === item.correct) {
                 btnElement.className = "w-full p-3.5 text-left rounded-xl bg-emerald-950/80 border-2 border-emerald-400 text-emerald-200 text-xs font-bold emerald-glow flex items-center space-x-2";
                 
-                // Puntos completos sin reducción
                 state.score += 100;
-                saveState();
 
                 feedback.className = "text-xs text-center font-bold text-emerald-400";
-                feedback.textContent = "¡Correcto! (+100 pts completos)";
+                feedback.textContent = "¡Correcto! (+100 pts)";
 
                 disableAllOptions();
                 setTimeout(() => nextQuestion(), 800);
@@ -472,20 +560,20 @@
 
             const feedback = document.getElementById("investigation-feedback");
             if (allCorrect) {
-                // Puntos de la fase final al 100%
                 state.score += 200;
                 
                 const worldKey = `world${state.activeWorld}`;
-                state.completed[worldKey] = true;
                 
-                // Guardar/Actualizar el mejor puntaje de este mundo
+                state.completed[worldKey] = true;
+                state.attempts[worldKey] = (state.attempts[worldKey] || 0) + 1;
+                
                 if (!state.scoresByWorld[worldKey] || state.score > state.scoresByWorld[worldKey]) {
                     state.scoresByWorld[worldKey] = state.score;
                 }
 
-                saveState();
+                saveActiveProfile();
 
-                const attempts = state.attempts[worldKey] || 1;
+                const attempts = state.attempts[worldKey];
 
                 document.getElementById("complete-world-title").textContent = `¡Mundo ${state.activeWorld} Completado!`;
                 document.getElementById("final-score-raw").textContent = `${state.score} pts`;
@@ -499,33 +587,28 @@
             }
         }
 
-        /* TABLA DE POSICIONES SIMULADA/LOCAL (PRIORIZA PUNTOS Y LUEGO MENOS INTENTOS) */
+        /* --- TABLA DE POSICIONES GENERAL --- */
         function updateMockLeaderboard() {
-            let leaderboard = JSON.parse(localStorage.getItem("tnm_global_leaderboard")) || [
-                { nombre: "Carlos M.", puntos: 500, intentos: 5 },
-                { nombre: "Elena R.", puntos: 500, intentos: 7 },
-                { nombre: "Mateo S.", puntos: 400, intentos: 5 }
-            ];
+            const profiles = getAllProfiles();
+            let leaderboard = [];
 
-            // Calcular el total del jugador actual
-            const totalScore = Object.values(state.scoresByWorld).reduce((a, b) => a + b, 0);
-            const totalAttempts = Object.values(state.attempts).reduce((a, b) => a + b, 0);
+            Object.keys(profiles).forEach(name => {
+                const p = profiles[name];
+                const totalScore = Object.values(p.scoresByWorld || {}).reduce((a, b) => a + b, 0);
+                const totalAttempts = Object.values(p.attempts || {}).reduce((a, b) => a + b, 0);
 
-            if (state.username && totalScore > 0) {
-                const existingIndex = leaderboard.findIndex(p => p.nombre === state.username);
-                if (existingIndex >= 0) {
-                    leaderboard[existingIndex] = { nombre: state.username, puntos: totalScore, intentos: totalAttempts };
-                } else {
-                    leaderboard.push({ nombre: state.username, puntos: totalScore, intentos: totalAttempts });
+                if (totalScore > 0) {
+                    leaderboard.push({
+                        nombre: name,
+                        puntos: totalScore,
+                        intentos: totalAttempts
+                    });
                 }
-            }
+            });
 
-            // Ordenamiento: 1. Puntos descendente | 2. Intentos ascendente (Menos intentos es mejor)
             leaderboard.sort((a, b) => {
-                if (b.puntos !== a.puntos) {
-                    return b.puntos - a.puntos; // Mayor puntaje primero
-                }
-                return a.intentos - b.intentos; // Menos intentos primero
+                if (b.puntos !== a.puntos) return b.puntos - a.puntos;
+                return a.intentos - b.intentos;
             });
 
             localStorage.setItem("tnm_global_leaderboard", JSON.stringify(leaderboard));
@@ -537,23 +620,27 @@
             const container = document.getElementById("leaderboard-rows");
             container.innerHTML = "";
 
-            leaderboard.forEach((player, idx) => {
-                const row = document.createElement("div");
-                const isCurrentPlayer = player.nombre === state.username;
-                
-                row.className = `grid grid-cols-12 p-2.5 text-xs font-semibold items-center ${
-                    isCurrentPlayer ? 'bg-amber-500/20 text-amber-200 border-l-2 border-amber-400' : 'text-slate-300'
-                }`;
+            if (leaderboard.length === 0) {
+                container.innerHTML = `<div class="p-4 text-center text-xs text-slate-500">Aún no hay puntuaciones registradas.</div>`;
+            } else {
+                leaderboard.forEach((player, idx) => {
+                    const row = document.createElement("div");
+                    const isCurrentPlayer = player.nombre === state.username;
+                    
+                    row.className = `grid grid-cols-12 p-2.5 text-xs font-semibold items-center ${
+                        isCurrentPlayer ? 'bg-amber-500/20 text-amber-200 border-l-2 border-amber-400' : 'text-slate-300'
+                    }`;
 
-                row.innerHTML = `
-                    <span class="col-span-2 text-center font-bold ${idx < 3 ? 'text-amber-400 font-serif-epic' : 'text-slate-500'}">#${idx + 1}</span>
-                    <span class="col-span-5 font-bold truncate">${player.nombre} ${isCurrentPlayer ? ' (Tú)' : ''}</span>
-                    <span class="col-span-3 text-right font-black text-emerald-400">${player.puntos} pts</span>
-                    <span class="col-span-2 text-center text-slate-400 text-[11px]">${player.intentos} int.</span>
-                `;
+                    row.innerHTML = `
+                        <span class="col-span-2 text-center font-bold ${idx < 3 ? 'text-amber-400 font-serif-epic' : 'text-slate-500'}">#${idx + 1}</span>
+                        <span class="col-span-5 font-bold truncate">${player.nombre} ${isCurrentPlayer ? ' (Tú)' : ''}</span>
+                        <span class="col-span-3 text-right font-black text-emerald-400">${player.puntos} pts</span>
+                        <span class="col-span-2 text-center text-slate-400 text-[11px]">${player.intentos} int.</span>
+                    `;
 
-                container.appendChild(row);
-            });
+                    container.appendChild(row);
+                });
+            }
 
             showScreen("screen-leaderboard");
         }
