@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafío Bíblico TNM - Ranking & Progreso</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #05070f;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(217, 119, 6, 0.15) 0%, transparent 75%),
+                radial-gradient(circle at 50% 100%, rgba(16, 185, 129, 0.08) 0%, transparent 75%);
+        }
+
+        .font-serif-epic { font-family: 'Cinzel', serif; }
+        .hidden-screen { display: none !important; }
+
+        .gold-glow {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.3), inset 0 0 15px rgba(245, 158, 11, 0.2);
+        }
+        .emerald-glow {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.3), inset 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+        .gold-text-glow {
+            text-shadow: 0 0 12px rgba(251, 191, 36, 0.6);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .anim-float { animation: float 3.5s ease-in-out infinite; }
+
+        @keyframes node-pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .anim-pop { animation: node-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col items-center justify-between p-3 sm:p-5 select-none relative overflow-x-hidden">
+
+    <!-- HUD SUPERIOR -->
+    <header class="w-full max-w-md bg-slate-900/90 border border-amber-500/30 rounded-2xl p-3.5 shadow-2xl backdrop-blur-md flex justify-between items-center mb-3 sticky top-2 z-50 gold-glow">
+        <div class="flex items-center space-x-3">
+            <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 p-[1px] shadow-lg anim-float">
+                <div class="w-full h-full bg-slate-950 rounded-[11px] flex items-center justify-center text-xl">
+                    📜
+                </div>
+            </div>
+            <div>
+                <h1 class="font-serif-epic font-black text-sm text-amber-300 tracking-wider gold-text-glow">DESAFÍO TNM</h1>
+                <p id="player-display" class="text-xs text-slate-300 font-bold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>Invitado</span>
+                </p>
+            </div>
+        </div>
+        <div class="text-right bg-slate-950/80 px-3 py-1.5 rounded-xl border border-amber-500/20">
+            <span class="text-[9px] text-amber-400/80 uppercase font-extrabold tracking-widest block">Intento Nivel</span>
+            <span id="level-attempt-display" class="text-base font-serif-epic font-black text-amber-300 gold-text-glow">#1</span>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <main class="w-full max-w-md bg-slate-900/80 border border-slate-800 rounded-3xl p-5 shadow-2xl backdrop-blur-md flex-1 flex flex-col justify-between relative overflow-hidden">
+
+        <!-- NAV DENTRO DE JUEGO -->
+        <nav id="nav-bar" class="hidden-screen flex justify-between items-center mb-3 pb-2 border-b border-slate-800">
+            <button onclick="confirmGoMap()" class="px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-amber-200 text-xs font-bold border border-amber-500/20 transition active:scale-95 flex items-center gap-1">
+                <span>🗺️ Mapa</span>
+            </button>
+            <button onclick="showLeaderboard()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 transition active:scale-95 flex items-center gap-1">
+                <span>🏆 Ranking</span>
+            </button>
+        </nav>
+
+        <!-- REGISTRO DE JUGADOR -->
+        <section id="screen-register" class="space-y-6 my-auto text-center anim-pop">
+            <div class="space-y-2">
+                <div class="w-20 h-20 bg-amber-500/10 border-2 border-amber-500/40 rounded-3xl flex items-center justify-center mx-auto text-4xl shadow-2xl gold-glow anim-float">
+                    ⚔️
+                </div>
+                <h2 class="font-serif-epic text-2xl font-black text-amber-300 gold-text-glow">Desafío Bíblico</h2>
+                <p class="text-xs text-slate-400 leading-relaxed px-4">Pon a prueba tu investigación bíblica y compite en el ranking global por precisión e intentos.</p>
+            </div>
+
+            <form id="form-register" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-[11px] font-extrabold text-amber-400/90 uppercase tracking-wider mb-1 pl-1">Nombre del Explorador</label>
+                    <input type="text" id="input-username" required placeholder="Ej. Yuser" 
+                           class="w-full px-4 py-3.5 rounded-xl bg-slate-950/90 border border-amber-500/30 text-white placeholder-slate-600 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 transition text-sm">
+                </div>
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-amber-500 via-amber-400 to-amber-600 hover:brightness-110 text-slate-950 font-serif-epic font-black rounded-xl transition shadow-xl gold-glow active:scale-95 text-sm uppercase tracking-wider">
+                    Iniciar Aventura
+                </button>
+            </form>
+        </section>
+
+        <!-- MAPA DE MUNDOS -->
+        <section id="screen-map" class="hidden-screen space-y-4 my-auto">
+            <div class="flex justify-between items-center mb-1">
+                <div>
+                    <h2 class="font-serif-epic text-lg font-black text-amber-300 gold-text-glow">Mapa de Mundos</h2>
+                    <p class="text-[11px] text-slate-400">Selecciona el libro para investigar</p>
+                </div>
+                <button onclick="showLeaderboard()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-xs font-bold border border-amber-500/40 transition">
+                    🏆 Ranking
+                </button>
+            </div>
+
+            <div id="world-nodes-list" class="w-full space-y-3 max-h-[380px] overflow-y-auto pr-1"></div>
+        </section>
+
+        <!-- PREGUNTAS (FILTRO DE ENTRADA) -->
+        <section id="screen-quiz" class="hidden-screen space-y-4 my-auto anim-pop">
+            <div class="flex justify-between items-center text-xs text-slate-400 font-bold border-b border-slate-800 pb-2">
+                <span id="quiz-world-title" class="text-amber-300 font-serif-epic">Filtro de Entrada</span>
+                <span id="quiz-progress" class="bg-amber-500/10 border border-amber-500/30 text-amber-300 px-2.5 py-0.5 rounded-full text-[10px]">Pregunta 1</span>
+            </div>
+
+            <div class="bg-slate-950/60 p-4 rounded-2xl border border-slate-800 space-y-2">
+                <h3 id="quiz-question" class="text-sm font-bold text-slate-100 leading-snug"></h3>
+            </div>
+
+            <div id="quiz-options" class="space-y-2.5"></div>
+
+            <div id="recommendation-box" class="hidden-screen p-3.5 bg-amber-500/10 border border-amber-500/40 rounded-xl space-y-1 gold-glow">
+                <div class="flex items-center space-x-1.5 text-amber-300 font-bold text-xs">
+                    <span>📖 Pista TNM:</span>
+                </div>
+                <p id="recommendation-text" class="text-xs text-amber-200/90 leading-relaxed"></p>
+            </div>
+
+            <p id="quiz-feedback" class="text-xs text-center font-bold min-h-[1.25rem]"></p>
+        </section>
+
+        <!-- INVESTIGACIÓN / EXPEDIENTE -->
+        <section id="screen-investigation" class="hidden-screen space-y-4 my-auto anim-pop">
+            <div class="border-b border-slate-800 pb-2">
+                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-widest block">Fase Final: Expediente</span>
+                <h3 id="investigation-title" class="font-serif-epic text-base font-bold text-amber-300">Investigación</h3>
+            </div>
+
+            <div id="investigation-tasks" class="space-y-3 max-h-[280px] overflow-y-auto pr-1"></div>
+
+            <button onclick="checkInvestigation()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:brightness-110 text-slate-950 font-serif-epic font-black rounded-xl transition shadow-lg emerald-glow active:scale-95 text-xs uppercase tracking-wider">
+                Verificar Expediente
+            </button>
+            <p id="investigation-feedback" class="text-xs text-center font-bold min-h-[1.25rem]"></p>
+        </section>
+
+        <!-- PANTALLA COMPLETADO -->
+        <section id="screen-complete" class="hidden-screen space-y-4 text-center my-auto anim-pop">
+            <div class="w-20 h-20 bg-emerald-500/20 border-2 border-emerald-400/50 rounded-3xl flex items-center justify-center mx-auto text-4xl emerald-glow anim-float">
+                🏆
+            </div>
+            <div>
+                <h2 id="complete-world-title" class="font-serif-epic text-xl font-black text-amber-300 gold-text-glow">¡Mundo Completado!</h2>
+                <p id="first-try-badge" class="text-xs font-bold text-emerald-400 mt-1 uppercase tracking-wider"></p>
+            </div>
+
+            <div class="bg-slate-950 p-4 rounded-2xl border border-amber-500/30 gold-glow space-y-3">
+                <div class="grid grid-cols-2 gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <span class="text-[9px] text-slate-400 uppercase font-bold block">Puntaje Obtenido</span>
+                        <span id="final-score-raw" class="text-lg font-bold text-emerald-400">0 pts</span>
+                    </div>
+                    <div>
+                        <span class="text-[9px] text-slate-400 uppercase font-bold block">Intentos Utilizados</span>
+                        <span id="final-level-attempts" class="text-lg font-bold text-amber-300">#1</span>
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-400">Tus puntos se mantienen intactos. En la tabla de posiciones clasificarás con mayor prioridad si usaste menos intentos.</p>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="shareScore()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 border border-amber-500/30 font-bold text-xs rounded-xl transition flex items-center justify-center gap-2 active:scale-95">
+                    <span>💬 Compartir Progreso en WhatsApp</span>
+                </button>
+                <button onclick="showScreen('screen-map')" class="w-full py-2.5 text-xs font-bold text-slate-400 hover:text-white transition">
+                    Volver al Mapa de Mundos
+                </button>
+            </div>
+        </section>
+
+        <!-- TABLA DE POSICIONES (RANKING GLOBAL) -->
+        <section id="screen-leaderboard" class="hidden-screen space-y-4 my-auto anim-pop">
+            <div class="text-center border-b border-slate-800 pb-2">
+                <h2 class="font-serif-epic text-lg font-black text-amber-300 gold-text-glow">Tabla de Posiciones</h2>
+                <p class="text-[10px] text-slate-400">Criterio: 1.º Mayor Puntaje | 2.º Menor Cantidad de Intentos</p>
+            </div>
+
+            <div class="bg-slate-950/80 rounded-2xl border border-amber-500/30 overflow-hidden">
+                <div class="grid grid-cols-12 bg-slate-900/90 p-2.5 text-[10px] font-black text-amber-400 uppercase tracking-wider border-b border-slate-800">
+                    <span class="col-span-2 text-center">Pos</span>
+                    <span class="col-span-5">Jugador</span>
+                    <span class="col-span-3 text-right">Puntos</span>
+                    <span class="col-span-2 text-center">Int.</span>
+                </div>
+                <div id="leaderboard-rows" class="divide-y divide-slate-800/60 max-h-[260px] overflow-y-auto"></div>
+            </div>
+
+            <button onclick="showScreen('screen-map')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-amber-300 font-bold text-xs rounded-xl transition">
+                Volver al Mapa
+            </button>
+        </section>
+
+    </main>
+
+    <footer class="w-full max-w-md text-center py-2 text-[10px] text-slate-500 font-medium">
+        Traducción del Nuevo Mundo (TNM) • Edición Interactiva
+    </footer>
+
+    <!-- CARGA DE ARCHIVOS JS -->
+    <script src="genesis.js"></script>
+    <script src="exodo.js"></script>
+    <script src="levitico.js"></script>
+    <script src="numeros.js"></script>
+    <script src="deuteronomio.js"></script>
+
+    <script>
+        let state = {
+            username: '',
+            score: 0,
+            activeWorld: 1,
+            attempts: {},
+            completed: {},
+            scoresByWorld: {}
+        };
+
+        let currentBookData = null;
+        let currentQuizIndex = 0;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            loadState();
+            document.getElementById("form-register").addEventListener("submit", (e) => {
+                e.preventDefault();
+                const name = document.getElementById("input-username").value.trim();
+                if (name) {
+                    state.username = name;
+                    saveState();
+                    renderMap();
+                    showScreen("screen-map");
+                }
+            });
+        });
+
+        function loadState() {
+            const saved = localStorage.getItem("tnm_game_data");
+            if (saved) {
+                state = JSON.parse(saved);
+                if (!state.attempts) state.attempts = {};
+                if (!state.completed) state.completed = {};
+                if (!state.scoresByWorld) state.scoresByWorld = {};
+                renderMap();
+                showScreen("screen-map");
+            } else {
+                showScreen("screen-register");
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem("tnm_game_data", JSON.stringify(state));
+            updateMockLeaderboard();
+        }
+
+        function updateHeader() {
+            document.getElementById("player-display").querySelector("span:last-child").textContent = state.username || "Invitado";
+            const currentWorldKey = `world${state.activeWorld || 1}`;
+            const currentAttempts = state.attempts[currentWorldKey] || 1;
+            document.getElementById("level-attempt-display").textContent = `#${currentAttempts}`;
+        }
+
+        /* RENDERIZADO DEL MAPA CON MUNDOS PASADOS COMO COMPLETADOS */
+        function renderMap() {
+            updateHeader();
+            const container = document.getElementById("world-nodes-list");
+            container.innerHTML = "";
+
+            const books = window.booksData || {};
+            const bookKeys = Object.keys(books);
+
+            bookKeys.forEach((id) => {
+                const book = books[id];
+                const worldKey = `world${book.id}`;
+                const attempts = state.attempts[worldKey] || 0;
+                const isCompleted = state.completed[worldKey] || false;
+                
+                const prevWorldKey = `world${book.id - 1}`;
+                const isUnlocked = book.id === 1 || state.completed[prevWorldKey];
+
+                const card = document.createElement("div");
+                card.className = "w-full bg-slate-950/80 p-3.5 rounded-2xl border flex items-center justify-between transition gap-3 " +
+                    (isCompleted 
+                        ? "border-emerald-500/50 bg-emerald-950/10 emerald-glow" 
+                        : isUnlocked 
+                            ? "border-amber-500/30 gold-glow" 
+                            : "border-slate-800 opacity-50");
+
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl font-bold ${
+                            isCompleted ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-400' :
+                            isUnlocked ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-slate-800 text-slate-600'
+                        }">
+                            ${isCompleted ? '✓' : isUnlocked ? (book.icon || '📖') : '🔒'}
+                        </div>
+                        <div>
+                            <span class="text-[9px] uppercase font-black tracking-widest ${isCompleted ? 'text-emerald-400' : 'text-amber-400'} block">
+                                ${isCompleted ? 'Mundo Completado' : `Mundo ${book.id}`}
+                            </span>
+                            <h3 class="font-serif-epic font-bold text-xs text-slate-100">${book.title}</h3>
+                            <span class="text-[9px] text-slate-400">Intentos realizados: ${attempts}</span>
+                        </div>
+                    </div>
+                    <button onclick="startWorld(${book.id})" ${!isUnlocked ? 'disabled' : ''} 
+                        class="px-3 py-2 rounded-xl text-xs font-bold transition active:scale-95 ${
+                            isCompleted ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950' :
+                            isUnlocked ? 'bg-amber-500 hover:bg-amber-400 text-slate-950' : 'bg-slate-800 text-slate-500'
+                        }">
+                        ${isCompleted ? 'Repetir' : isUnlocked ? 'Jugar' : 'Bloqueado'}
+                    </button>
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function showScreen(id) {
+            const screens = ["screen-register", "screen-map", "screen-quiz", "screen-investigation", "screen-complete", "screen-leaderboard"];
+            screens.forEach(s => document.getElementById(s).classList.add("hidden-screen"));
+            document.getElementById(id).classList.remove("hidden-screen");
+
+            const navBar = document.getElementById("nav-bar");
+            if (id === "screen-register" || id === "screen-map" || id === "screen-leaderboard") {
+                navBar.classList.add("hidden-screen");
+            } else {
+                navBar.classList.remove("hidden-screen");
+            }
+        }
+
+        function confirmGoMap() {
+            if (confirm("¿Deseas volver al mapa? El intento actual se reiniciará.")) {
+                renderMap();
+                showScreen("screen-map");
+            }
+        }
+
+        function startWorld(worldNum) {
+            state.activeWorld = worldNum;
+            const worldKey = `world${worldNum}`;
+
+            if (!state.attempts[worldKey]) state.attempts[worldKey] = 0;
+            state.attempts[worldKey]++;
+            state.score = 0; // Se acumulan puntos del intento actual
+
+            currentBookData = window.booksData[worldNum];
+
+            document.getElementById("quiz-world-title").textContent = `Filtro: ${currentBookData.title}`;
+            document.getElementById("investigation-title").textContent = `Investigación de ${currentBookData.title}`;
+
+            saveState();
+            updateHeader();
+
+            currentQuizIndex = 0;
+            renderQuizQuestion();
+            showScreen("screen-quiz");
+        }
+
+        function renderQuizQuestion() {
+            const item = currentBookData.quiz[currentQuizIndex];
+            document.getElementById("quiz-progress").textContent = `Pregunta ${currentQuizIndex + 1} de ${currentBookData.quiz.length}`;
+            document.getElementById("quiz-question").textContent = item.q;
+            document.getElementById("quiz-feedback").textContent = "";
+            document.getElementById("recommendation-box").classList.add("hidden-screen");
+
+            const optsContainer = document.getElementById("quiz-options");
+            optsContainer.innerHTML = "";
+
+            item.options.forEach((opt, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "w-full p-3.5 text-left rounded-xl bg-slate-950/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/30 transition text-xs font-semibold text-slate-200 flex items-center space-x-2.5 active:scale-98";
+                btn.innerHTML = `<span class="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 text-center leading-6 text-[10px] font-bold">${String.fromCharCode(65 + idx)}</span><span>${opt}</span>`;
+                btn.onclick = () => handleAnswer(idx, btn);
+                optsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selectedIdx, btnElement) {
+            const item = currentBookData.quiz[currentQuizIndex];
+            const feedback = document.getElementById("quiz-feedback");
+
+            if (selectedIdx === item.correct) {
+                btnElement.className = "w-full p-3.5 text-left rounded-xl bg-emerald-950/80 border-2 border-emerald-400 text-emerald-200 text-xs font-bold emerald-glow flex items-center space-x-2";
+                
+                // Puntos completos sin reducción
+                state.score += 100;
+                saveState();
+
+                feedback.className = "text-xs text-center font-bold text-emerald-400";
+                feedback.textContent = "¡Correcto! (+100 pts completos)";
+
+                disableAllOptions();
+                setTimeout(() => nextQuestion(), 800);
+
+            } else {
+                btnElement.disabled = true;
+                btnElement.className = "w-full p-3.5 text-left rounded-xl bg-red-950/40 border border-red-800/60 text-red-400 text-xs font-semibold opacity-60 flex items-center space-x-2";
+
+                document.getElementById("recommendation-text").textContent = item.reading;
+                document.getElementById("recommendation-box").classList.remove("hidden-screen");
+
+                feedback.className = "text-xs text-center font-bold text-red-400";
+                feedback.textContent = "Incorrecto. Lee la sugerencia e intenta con otra opción.";
+            }
+        }
+
+        function disableAllOptions() {
+            const btns = document.querySelectorAll("#quiz-options button");
+            btns.forEach(b => b.disabled = true);
+        }
+
+        function nextQuestion() {
+            currentQuizIndex++;
+            if (currentQuizIndex < currentBookData.quiz.length) {
+                renderQuizQuestion();
+            } else {
+                renderInvestigation();
+                showScreen("screen-investigation");
+            }
+        }
+
+        function renderInvestigation() {
+            const container = document.getElementById("investigation-tasks");
+            container.innerHTML = "";
+
+            currentBookData.investigation.forEach((task) => {
+                const box = document.createElement("div");
+                box.className = "bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2";
+
+                const p = document.createElement("p");
+                p.className = "text-xs text-slate-300 leading-relaxed font-medium";
+                p.textContent = task.event;
+
+                const select = document.createElement("select");
+                select.id = task.id;
+                select.className = "w-full p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-amber-300 font-bold focus:outline-none focus:border-amber-400";
+
+                currentBookData.characters.forEach(char => {
+                    const opt = document.createElement("option");
+                    opt.value = char === "Seleccionar..." ? "" : char;
+                    opt.textContent = char;
+                    select.appendChild(opt);
+                });
+
+                box.appendChild(p);
+                box.appendChild(select);
+                container.appendChild(box);
+            });
+        }
+
+        function checkInvestigation() {
+            let allCorrect = true;
+            currentBookData.investigation.forEach((task) => {
+                const val = document.getElementById(task.id).value;
+                if (val !== task.correct) allCorrect = false;
+            });
+
+            const feedback = document.getElementById("investigation-feedback");
+            if (allCorrect) {
+                // Puntos de la fase final al 100%
+                state.score += 200;
+                
+                const worldKey = `world${state.activeWorld}`;
+                state.completed[worldKey] = true;
+                
+                // Guardar/Actualizar el mejor puntaje de este mundo
+                if (!state.scoresByWorld[worldKey] || state.score > state.scoresByWorld[worldKey]) {
+                    state.scoresByWorld[worldKey] = state.score;
+                }
+
+                saveState();
+
+                const attempts = state.attempts[worldKey] || 1;
+
+                document.getElementById("complete-world-title").textContent = `¡Mundo ${state.activeWorld} Completado!`;
+                document.getElementById("final-score-raw").textContent = `${state.score} pts`;
+                document.getElementById("final-level-attempts").textContent = `#${attempts}`;
+                document.getElementById("first-try-badge").textContent = attempts === 1 ? "🌟 Logrado al 1.er Intento" : `Logrado al intento #${attempts}`;
+
+                showScreen("screen-complete");
+            } else {
+                feedback.className = "text-xs text-center font-bold text-red-400";
+                feedback.textContent = "Hay asignaciones incorrectas. Revisa tu expediente.";
+            }
+        }
+
+        /* TABLA DE POSICIONES SIMULADA/LOCAL (PRIORIZA PUNTOS Y LUEGO MENOS INTENTOS) */
+        function updateMockLeaderboard() {
+            let leaderboard = JSON.parse(localStorage.getItem("tnm_global_leaderboard")) || [
+                { nombre: "Carlos M.", puntos: 500, intentos: 5 },
+                { nombre: "Elena R.", puntos: 500, intentos: 7 },
+                { nombre: "Mateo S.", puntos: 400, intentos: 5 }
+            ];
+
+            // Calcular el total del jugador actual
+            const totalScore = Object.values(state.scoresByWorld).reduce((a, b) => a + b, 0);
+            const totalAttempts = Object.values(state.attempts).reduce((a, b) => a + b, 0);
+
+            if (state.username && totalScore > 0) {
+                const existingIndex = leaderboard.findIndex(p => p.nombre === state.username);
+                if (existingIndex >= 0) {
+                    leaderboard[existingIndex] = { nombre: state.username, puntos: totalScore, intentos: totalAttempts };
+                } else {
+                    leaderboard.push({ nombre: state.username, puntos: totalScore, intentos: totalAttempts });
+                }
+            }
+
+            // Ordenamiento: 1. Puntos descendente | 2. Intentos ascendente (Menos intentos es mejor)
+            leaderboard.sort((a, b) => {
+                if (b.puntos !== a.puntos) {
+                    return b.puntos - a.puntos; // Mayor puntaje primero
+                }
+                return a.intentos - b.intentos; // Menos intentos primero
+            });
+
+            localStorage.setItem("tnm_global_leaderboard", JSON.stringify(leaderboard));
+        }
+
+        function showLeaderboard() {
+            updateMockLeaderboard();
+            const leaderboard = JSON.parse(localStorage.getItem("tnm_global_leaderboard")) || [];
+            const container = document.getElementById("leaderboard-rows");
+            container.innerHTML = "";
+
+            leaderboard.forEach((player, idx) => {
+                const row = document.createElement("div");
+                const isCurrentPlayer = player.nombre === state.username;
+                
+                row.className = `grid grid-cols-12 p-2.5 text-xs font-semibold items-center ${
+                    isCurrentPlayer ? 'bg-amber-500/20 text-amber-200 border-l-2 border-amber-400' : 'text-slate-300'
+                }`;
+
+                row.innerHTML = `
+                    <span class="col-span-2 text-center font-bold ${idx < 3 ? 'text-amber-400 font-serif-epic' : 'text-slate-500'}">#${idx + 1}</span>
+                    <span class="col-span-5 font-bold truncate">${player.nombre} ${isCurrentPlayer ? ' (Tú)' : ''}</span>
+                    <span class="col-span-3 text-right font-black text-emerald-400">${player.puntos} pts</span>
+                    <span class="col-span-2 text-center text-slate-400 text-[11px]">${player.intentos} int.</span>
+                `;
+
+                container.appendChild(row);
+            });
+
+            showScreen("screen-leaderboard");
+        }
+
+        function shareScore() {
+            const worldKey = `world${state.activeWorld}`;
+            const attempts = state.attempts[worldKey] || 1;
+            const text = `🏆 ¡Completé ${currentBookData.title} en el Desafío TNM!\n\n• Jugador: ${state.username}\n• Puntaje: ${state.score} pts máximos\n• Intentos: #${attempts}\n\n¿Puedes lograrlo en menos intentos? 📖✨`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+        }
+    </script>
+</body>
+</html>
